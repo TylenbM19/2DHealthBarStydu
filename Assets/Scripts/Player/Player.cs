@@ -1,62 +1,38 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UI;
 
 public class Player : MonoBehaviour
-{
-    [SerializeField] private int _maxHealth;
-    [SerializeField] private int _currentHealth; // оставил его [SerializeField] для того, чтобы наблюдать изменение жизни.
-    [SerializeField] private Button _damageButton;
-    [SerializeField] private Button _healingButton;
-    [SerializeField] private int _damage;
-    [SerializeField] private int _healing;
+{ 
+    [SerializeField] private int _maxHealth = 10;
+    [SerializeField] private int _currentHealth; // оставил его [SerializeField] для того, чтобы наблюдать изменение жизни.    
 
     public event UnityAction<int, int> HealthChanged;
+    private int _minHealth = 0;
 
     private void Start()
     {
         _currentHealth = _maxHealth;
     }
 
-    private void OnEnable()
+    public void TakeDamage(int damage)
     {
-        _damageButton.onClick.AddListener(OnDamageButtonClick);
-        _healingButton.onClick.AddListener(OnHealtingButtonClick);
+        ChangeHealth(-damage);
     }
 
-    private void OnDisable()
+    public void Heal(int health)
     {
-        _damageButton.onClick.RemoveListener(OnDamageButtonClick);
-        _healingButton.onClick.RemoveListener(OnHealtingButtonClick);
+        ChangeHealth(health);
     }
 
-    private void ApplyDamage(int damage)
+    private void ChangeHealth(int value)
     {
-        if (_currentHealth != 0)
+        // Mathf.Clamp для того, чтоб не выходить за рамки min и max значения. Не зависимости какой параметр дашь.
+        int tempCurrentHealth = Mathf.Clamp(_currentHealth + value, _minHealth, _maxHealth);
+
+        if (tempCurrentHealth != _currentHealth)
         {
-            _currentHealth -= damage;
+            _currentHealth = tempCurrentHealth;
             HealthChanged?.Invoke(_currentHealth, _maxHealth);
         }
-    }
-
-    private void ApplyHealing(int healting)
-    {
-        if (_currentHealth < _maxHealth)
-        {
-            _currentHealth += healting;
-            HealthChanged?.Invoke(_currentHealth, _maxHealth);
-        }
-    }
-
-    private void OnDamageButtonClick()
-    {
-        ApplyDamage(_damage);
-    }
-
-    private void OnHealtingButtonClick()
-    {
-        ApplyHealing(_healing);
     }
 }

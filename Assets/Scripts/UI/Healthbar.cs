@@ -1,26 +1,25 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+[RequireComponent(typeof(Slider))]
 public class Healthbar : MonoBehaviour
 {
-    [SerializeField] private Slider _slider;
     [SerializeField] private Player _player;
 
+    private Slider _slider;
     private Coroutine _coroutine;
+    private float _speedChangeSlider = 1f;
     private float _changeValue = 1f;
-    private float _speedChangeSlider = 0.5f;
+
+    private void Awake()
+    {
+        _slider = GetComponent<Slider>();
+    }
 
     private void Start()
     {
-        _slider = GetComponent<Slider>();
         _slider.value = _changeValue;
-    }
-
-    private void FixedUpdate()
-    {
-        SetSetting();
     }
 
     private void OnEnable()
@@ -36,22 +35,25 @@ public class Healthbar : MonoBehaviour
     private void OnValueChanged(int value, int maxValue)
     {
         _changeValue = (float)value / maxValue;
+        StartSliderCoroutine();
     }
 
-    private void SetSetting()
+    private void StartSliderCoroutine()
     {
         if (_coroutine != null)
             StopCoroutine(_coroutine);
 
-        _coroutine = StartCoroutine(CoroutineSlider(_changeValue));
+        _coroutine = StartCoroutine(CoroutineSlider());
     }
 
-    private IEnumerator CoroutineSlider(float changeValue)
+    private IEnumerator CoroutineSlider()
     {
-        if (_slider.value != changeValue)
+        var fixedUpdateAwaiter = new WaitForFixedUpdate();
+
+        while (_slider.value != _changeValue)
         {
-            _slider.value = Mathf.MoveTowards(_slider.value, changeValue, _speedChangeSlider * Time.deltaTime);
-            yield return null;
+            _slider.value = Mathf.MoveTowards(_slider.value, _changeValue, _speedChangeSlider * Time.deltaTime);
+            yield return fixedUpdateAwaiter;
         }
     }
 }
