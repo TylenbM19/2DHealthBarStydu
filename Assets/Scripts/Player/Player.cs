@@ -4,9 +4,9 @@ using UnityEngine.Events;
 public class Player : MonoBehaviour
 { 
     [SerializeField] private int _maxHealth = 10;
-    [SerializeField] private int _currentHealth; // оставил его [SerializeField] для того, чтобы наблюдать изменение жизни.    
+    [SerializeField] private int _currentHealth;
 
-    public event UnityAction<int, int> HealthChanged;
+    public event UnityAction<int, int> OnHealthChanged;
     private int _minHealth = 0;
 
     private void Start()
@@ -26,13 +26,12 @@ public class Player : MonoBehaviour
 
     private void ChangeHealth(int value)
     {
-        // Mathf.Clamp для того, чтоб не выходить за рамки min и max значения. Не зависимости какой параметр дашь.
         int tempCurrentHealth = Mathf.Clamp(_currentHealth + value, _minHealth, _maxHealth);
 
         if (tempCurrentHealth != _currentHealth)
         {
             _currentHealth = tempCurrentHealth;
-            HealthChanged?.Invoke(_currentHealth, _maxHealth);
+            OnHealthChanged?.Invoke(_currentHealth, _maxHealth);
         }
     }
 }

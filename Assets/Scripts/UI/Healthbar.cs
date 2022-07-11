@@ -24,21 +24,21 @@ public class Healthbar : MonoBehaviour
 
     private void OnEnable()
     {
-        _player.HealthChanged += OnValueChanged;
+        _player.OnHealthChanged += OnValueChanged;
     }
 
     private void OnDisable()
     {
-        _player.HealthChanged -= OnValueChanged;
+        _player.OnHealthChanged -= OnValueChanged;
     }
 
     private void OnValueChanged(int value, int maxValue)
     {
         _changeValue = (float)value / maxValue;
-        StartSliderCoroutine();
+        CallCoroutine();
     }
 
-    private void StartSliderCoroutine()
+    private void CallCoroutine()
     {
         if (_coroutine != null)
             StopCoroutine(_coroutine);
